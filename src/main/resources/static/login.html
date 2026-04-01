@@ -33,9 +33,14 @@ async function login() {
         body: JSON.stringify({ username, password })
     });
 
+    // 🔥 FIX: HANDLE ERROR RESPONSE
+    if (!response.ok) {
+        alert("Login failed: " + response.status);
+        return;
+    }
+
     const result = await response.json();
 
-    // 🔥 STORE TOKEN
     localStorage.setItem("token", result.token);
 
     if (result.role === "ADMIN") {

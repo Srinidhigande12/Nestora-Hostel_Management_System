@@ -37,13 +37,19 @@ public class AuthController {
     @PostMapping("/login")
     public Object login(@RequestBody User user) {
 
-        // 🔐 Validate user
+        // 🔥 DEBUG INPUT
+        System.out.println("INPUT USER: " + user.getUsername());
+        System.out.println("INPUT PASS: " + user.getPassword());
+
         User existing = authService.login(user.getUsername(), user.getPassword());
 
-        // 🔐 Generate JWT token
+        // 🔥 DEBUG DB USER
+        System.out.println("DB USER: " + existing.getUsername());
+        System.out.println("DB PASS: " + existing.getPassword());
+        System.out.println("ROLE: " + existing.getRole());
+
         String token = JwtUtil.generateToken(existing.getUsername());
 
-        // 🔥 Return token + role
         return Map.of(
                 "token", token,
                 "role", existing.getRole()

@@ -13,15 +13,17 @@ public class Resident {
     private String email;
     private String phone;
 
-    // 🔥 REMOVE RELATIONS TEMPORARILY (IMPORTANT)
-    // private Room room;
-    // private Hostel hostel;
-    // private Category category;
+    // 🔥 EMPTY CONSTRUCTOR
+    public Resident() {}
 
     // GETTERS & SETTERS
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {

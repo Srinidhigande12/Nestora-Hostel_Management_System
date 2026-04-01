@@ -15,21 +15,11 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
 
-                // 🔥 ALLOW ALL STATIC FILES
+                // ✅ ALLOW EVERYTHING FOR NOW
                 .requestMatchers(
-                        "/",
-                        "/login.html",
-                        "/signup.html",
-                        "/user-dashboard.html",
-                        "/admin-dashboard.html",
-                        "/forgot-password.html",
-                        "/css/**",
-                        "/js/**",
-                        "/auth/**"
+                        "/**"
                 ).permitAll()
 
-                // 🔒 APIs require login
-                .anyRequest().authenticated()
             );
 
         return http.build();

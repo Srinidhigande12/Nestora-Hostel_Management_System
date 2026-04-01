@@ -35,21 +35,13 @@ async function login() {
 
     const result = await response.json();
 
-    if (result.token) {
+    // 🔥 STORE TOKEN
+    localStorage.setItem("token", result.token);
 
-        // 🔐 SAVE TOKEN + ROLE
-        localStorage.setItem("token", result.token);
-        localStorage.setItem("role", result.role);
-
-        // 🔀 REDIRECT BASED ON ROLE
-        if (result.role === "ADMIN") {
-            window.location.href = "/admin-dashboard.html";
-        } else {
-            window.location.href = "/user-dashboard.html";
-        }
-
+    if (result.role === "ADMIN") {
+        window.location.href = "/admin-dashboard.html";
     } else {
-        alert("Invalid login ❌");
+        window.location.href = "/user-dashboard.html";
     }
 }
 </script>

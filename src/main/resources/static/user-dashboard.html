@@ -15,7 +15,7 @@
 
     <h2>Your Fees</h2>
 
-    <table border="1" width="100%">
+    <table border="1">
         <thead>
             <tr>
                 <th>ID</th>
@@ -24,86 +24,75 @@
                 <th>Action</th>
             </tr>
         </thead>
-
         <tbody id="feesTable"></tbody>
     </table>
 
 </div>
 
 <script>
-
 const token = localStorage.getItem("token");
 
-// 🔐 ROLE CHECK
-const role = localStorage.getItem("role");
-if (role !== "USER") {
-    alert("Access Denied");
-    window.location.href = "/login.html";
-}
-
-// 🚀 LOAD FEES
 async function loadFees() {
 
-    const response = await fetch("http://localhost:9081/fees", {
+    const response = await fetch("/fees", {
+        method: "GET",
         headers: {
             "Authorization": "Bearer " + token
         }
     });
 
+    if (!response.ok) {
+        alert("Error: " + response.status);
+        return;
+    }
+
     const data = await response.json();
 
-    let html = "";
+    const table = document.getElementById("feesTable");
+    table.innerHTML = "";
 
     data.forEach(fee => {
 
-        html += `
+        const row = `
             <tr>
                 <td>${fee.feeId}</td>
                 <td>${fee.amount}</td>
-                <td style="color:${fee.status === 'PAID' ? 'green' : 'red'}">
-                    ${fee.status}
-                </td>
+                <td>${fee.status}</td>
                 <td>
-                    ${
-                        fee.status === 'PENDING'
+                    ${fee.status === "PENDING" 
                         ? `<button onclick="payFee(${fee.feeId})">Pay</button>`
-                        : '✔'
-                    }
+                        : "✔ Paid"}
                 </td>
             </tr>
         `;
-    });
 
-    document.getElementById("feesTable").innerHTML = html;
+        table.innerHTML += row;
+    });
 }
 
-// 💳 PAY FEE
 async function payFee(id) {
 
-    const response = await fetch(`http://localhost:9081/fees/pay/${id}`, {
+    const response = await fetch(`/fees/pay/${id}`, {
         method: "PUT",
         headers: {
             "Authorization": "Bearer " + token
         }
     });
 
-    if (response.status === 200) {
-        alert("Payment Successful ✅");
+    if (response.ok) {
+        alert("Payment successful ✅");
         loadFees();
     } else {
-        alert("Payment Failed ❌");
+        alert("Payment failed ❌");
     }
 }
 
-// 🚪 LOGOUT
 function logout() {
     localStorage.clear();
     window.location.href = "/login.html";
 }
 
-// 🔥 INIT
 loadFees();
-
 </script>
 
 </body>

@@ -9,28 +9,27 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
+	    http
+	        .csrf(csrf -> csrf.disable())
+	        .authorizeHttpRequests(auth -> auth
 
-                // ✅ PUBLIC
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/", "/login.html", "/signup.html",
-                                 "/admin-dashboard.html", "/user-dashboard.html",
-                                 "/css/**", "/js/**").permitAll()
+	            // ✅ PUBLIC
+	            
+	            .requestMatchers("/", "/login.html", "/signup.html",
+	                             "/admin-dashboard.html", "/user-dashboard.html",
+	                             "/css/**", "/js/**").permitAll()
 
-                // 🔥 ADD THESE
-                .requestMatchers("/rooms/**").permitAll()
-                .requestMatchers("/residents/**").permitAll()
+	            // ✅ ALLOW ROOMS (TEMP FIX)
+	            .requestMatchers("/rooms/**").permitAll()
 
-                // 🔐 REST
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);
+	            // 🔐 REST PROTECTED
+	            .anyRequest().authenticated()
+	        )
+	        .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+	    return http.build();
+	}
 }

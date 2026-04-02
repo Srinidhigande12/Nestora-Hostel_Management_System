@@ -2,31 +2,43 @@ package com.example.demo.service;
 
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.security.JwtUtil;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class AuthService {
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    public AuthService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // ✅ SIGNUP
     public User signup(User user) {
 
-        if (user.getRole() == null) {
+        if (userRepository.findByUsername(user.getUsername()) != null) {
+            throw new RuntimeException("Username already exists");
+        }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // ✅ VERY IMPORTANT FIX
+        if (user.getRole() == null || user.getRole().isEmpty()) {
             user.setRole("USER");
         }
 
         return userRepository.save(user);
     }
 
-    // ✅ LOGIN
-    public User login(String username, String password) {
+    // ✅ LOGIN (USERNAME + ROLE)
+    public Map<String, String> login(String username, String password) {
 
         User user = userRepository.findByUsername(username);
 
@@ -34,15 +46,16 @@ public class AuthService {
             throw new RuntimeException("User not found");
         }
 
-        if (!user.getPassword().equals(password)) {
-            throw new RuntimeException("Invalid password");
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Wrong password");
         }
 
-        return user;
-    }
+        String token = JwtUtil.generateToken(user.getUsername());
 
-    // ✅ GET ALL USERS (ADMIN)
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+        response.put("role", user.getRole());
+
+        return response;
     }
 }

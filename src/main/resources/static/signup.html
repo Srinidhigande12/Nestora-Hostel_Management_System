@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Signup</title>
 
-    <!-- CSS LINK -->
+<head>
+    <title>Nestora - Hostel Management System</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
 
-<div class="container">
+<div class="login-container">
     <h2>Signup</h2>
 
     <input type="text" id="username" placeholder="Enter Username"><br>
+    <input type="email" id="email" placeholder="Enter Email"><br>
     <input type="password" id="password" placeholder="Enter Password"><br>
 
     <select id="role">
@@ -22,24 +22,32 @@
 
     <button onclick="signup()">Signup</button>
 
-    <p>Already have account? <a href="/login.html">Login</a></p>
+    <p><a href="/login.html">Login</a></p>
 </div>
 
 <script>
 async function signup() {
+
     const username = document.getElementById("username").value;
+    const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const role = document.getElementById("role").value;
 
-    await fetch("/auth/signup", {
+    const response = await fetch("/auth/signup", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ username, password, role })
+        body: JSON.stringify({ username, email, password, role })
     });
 
-    alert("Signup Successful ✅");
+    if (!response.ok) {
+        const text = await response.text();
+        alert("Signup failed ❌ " + text);
+        return;
+    }
+
+    alert("Signup successful ✅");
     window.location.href = "/login.html";
 }
 </script>

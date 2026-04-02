@@ -1,21 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>User Dashboard</title>
+    <title>Nestora - Hostel Management System</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
 
-<div class="navbar">User Dashboard</div>
+<!-- ✅ NAVBAR -->
+<div class="navbar">
+    <div>
+        Welcome, <span id="usernameDisplay"></span>
+    </div>
+    <div>
+        <a href="/user-dashboard.html">Home</a>
+        <a href="/admin-dashboard.html">Admin</a>
+        <button onclick="logout()">Logout</button>
+    </div>
+</div>
 
 <div class="container">
 
-    <button onclick="logout()">Logout</button>
-
     <h2>Your Fees</h2>
 
-    <table border="1">
+    <table>
         <thead>
             <tr>
                 <th>ID</th>
@@ -30,19 +38,43 @@
 </div>
 
 <script>
-const token = localStorage.getItem("token");
 
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role");
+
+if (!token || !role) {
+    alert("Please login first ❌");
+    window.location.href = "/login.html";
+}
+
+if (role !== "USER" && role !== "ADMIN") {
+    alert("Access denied ❌");
+    window.location.href = "/login.html";
+}
+
+// ✅ USERNAME
+function getUsernameFromToken() {
+    const payload = token.split(".")[1];
+    const decoded = JSON.parse(atob(payload));
+    return decoded.sub;
+}
+
+document.getElementById("usernameDisplay").innerText = getUsernameFromToken();
+
+// ✅ LOAD FEES
 async function loadFees() {
 
+    document.getElementById("feesTable").innerHTML =
+        "<tr><td colspan='4'>Loading...</td></tr>";
+
     const response = await fetch("/fees", {
-        method: "GET",
         headers: {
             "Authorization": "Bearer " + token
         }
     });
 
     if (!response.ok) {
-        alert("Error: " + response.status);
+        alert("Error ❌");
         return;
     }
 
@@ -51,48 +83,46 @@ async function loadFees() {
     const table = document.getElementById("feesTable");
     table.innerHTML = "";
 
-    data.forEach(fee => {
+    if (data.length === 0) {
+        table.innerHTML = "<tr><td colspan='4'>No fees found</td></tr>";
+        return;
+    }
 
-        const row = `
+    data.forEach(fee => {
+        table.innerHTML += `
             <tr>
                 <td>${fee.feeId}</td>
                 <td>${fee.amount}</td>
                 <td>${fee.status}</td>
                 <td>
-                    ${fee.status === "PENDING" 
+                    ${fee.status === "PENDING"
                         ? `<button onclick="payFee(${fee.feeId})">Pay</button>`
                         : "✔ Paid"}
                 </td>
             </tr>
         `;
-
-        table.innerHTML += row;
     });
 }
 
+// ✅ PAY
 async function payFee(id) {
-
-    const response = await fetch(`/fees/pay/${id}`, {
+    await fetch(`/fees/pay/${id}`, {
         method: "PUT",
         headers: {
             "Authorization": "Bearer " + token
         }
     });
-
-    if (response.ok) {
-        alert("Payment successful ✅");
-        loadFees();
-    } else {
-        alert("Payment failed ❌");
-    }
+    loadFees();
 }
 
+// ✅ LOGOUT
 function logout() {
     localStorage.clear();
     window.location.href = "/login.html";
 }
 
-loadFees();
+window.onload = loadFees;
+
 </script>
 
 </body>

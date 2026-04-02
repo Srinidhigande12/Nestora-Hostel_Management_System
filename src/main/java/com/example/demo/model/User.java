@@ -11,10 +11,12 @@ public class User {
     private Long id;
 
     private String username;
+    private String email;
     private String password;
 
-    // 🔥 ADD ROLE
-    private String role; // ADMIN or USER
+    // ✅ ADD THIS (VERY IMPORTANT)
+    @Column(nullable = false)
+    private String role = "USER";
 
     // GETTERS & SETTERS
 
@@ -30,6 +32,14 @@ public class User {
         this.username = username;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -38,6 +48,7 @@ public class User {
         this.password = password;
     }
 
+    // ✅ ROLE GETTER/SETTER
     public String getRole() {
         return role;
     }

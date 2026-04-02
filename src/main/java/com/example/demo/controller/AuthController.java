@@ -1,14 +1,11 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
-import com.example.demo.security.JwtUtil;
 import com.example.demo.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -16,65 +13,27 @@ import java.util.Map;
 public class AuthController {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private AuthService authService;
 
     // ✅ SIGNUP
     @PostMapping("/signup")
-    public User signup(@RequestBody User user) {
-
-        // 🔥 Default role
-        if (user.getRole() == null) {
-            user.setRole("USER");
+    public ResponseEntity<?> signup(@RequestBody User user) {
+        try {
+            return ResponseEntity.ok(authService.signup(user));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
         }
-
-        return userRepository.save(user);
     }
 
-    // ✅ LOGIN (JWT + ROLE)
+    // ✅ LOGIN
     @PostMapping("/login")
-    public Object login(@RequestBody User user) {
-
-        // 🔥 DEBUG INPUT
-        System.out.println("INPUT USER: " + user.getUsername());
-        System.out.println("INPUT PASS: " + user.getPassword());
-
-        User existing = authService.login(user.getUsername(), user.getPassword());
-
-        // 🔥 DEBUG DB USER
-        System.out.println("DB USER: " + existing.getUsername());
-        System.out.println("DB PASS: " + existing.getPassword());
-        System.out.println("ROLE: " + existing.getRole());
-
-        String token = JwtUtil.generateToken(existing.getUsername());
-
-        return Map.of(
-                "token", token,
-                "role", existing.getRole()
-        );
-    }
-
-    // ✅ FORGOT PASSWORD
-    @PostMapping("/forgot-password")
-    public String resetPassword(@RequestBody User user) {
-
-        User existing = userRepository.findByUsername(user.getUsername());
-
-        if (existing == null) {
-            return "User not found";
+    public ResponseEntity<?> login(@RequestBody User user) {
+        try {
+            return ResponseEntity.ok(
+                    authService.login(user.getUsername(), user.getPassword())
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
         }
-
-        existing.setPassword(user.getPassword());
-        userRepository.save(existing);
-
-        return "Password updated successfully";
-    }
-
-    // ✅ GET ALL USERS (ADMIN USE)
-    @GetMapping("/all")
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
     }
 }

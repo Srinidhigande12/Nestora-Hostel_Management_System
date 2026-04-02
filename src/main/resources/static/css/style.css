@@ -1,28 +1,46 @@
+/* ===== GLOBAL ===== */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     background: #f4f6f9;
 }
 
-/* NAVBAR */
+/* ===== NAVBAR ===== */
 .navbar {
     background: #2c3e50;
     color: white;
-    padding: 15px;
-    text-align: center;
-    font-size: 20px;
+    padding: 15px 25px;
+    font-size: 18px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-/* CONTAINER */
+.navbar a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.navbar a:hover {
+    text-decoration: underline;
+}
+
+/* ===== CONTAINER ===== */
 .container {
     padding: 20px;
+    max-width: 900px;
+    margin: auto;
 }
 
-/* CARDS */
+/* ===== CARDS ===== */
 .cards {
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
+    margin-top: 20px;
 }
 
 .card {
@@ -30,7 +48,7 @@ body {
     min-width: 200px;
     background: white;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 12px;
     text-align: center;
     box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
 }
@@ -39,25 +57,26 @@ body {
     margin: 10px 0;
 }
 
-/* TABLE */
-.table {
+/* ===== TABLE ===== */
+table {
     width: 100%;
     margin-top: 20px;
     border-collapse: collapse;
+    background: white;
 }
 
-.table th, .table td {
+th, td {
     border: 1px solid #ddd;
     padding: 10px;
     text-align: center;
 }
 
-.table th {
+th {
     background: #2c3e50;
     color: white;
 }
 
-/* FORM INPUTS */
+/* ===== FORM INPUTS ===== */
 input, select {
     width: 90%;
     padding: 10px;
@@ -66,10 +85,11 @@ input, select {
     border: 1px solid #ccc;
 }
 
-/* BUTTON */
+/* ===== BUTTON ===== */
 button {
     padding: 10px 20px;
-    background: #4CAF50;
+    margin-top: 10px;
+    background: #3498db;
     color: white;
     border: none;
     border-radius: 5px;
@@ -77,10 +97,10 @@ button {
 }
 
 button:hover {
-    background: #45a049;
+    background: #2980b9;
 }
 
-/* LOGIN / SIGNUP BOX */
+/* ===== LOGIN / SIGNUP BOX ===== */
 .login-container {
     width: 320px;
     margin: 100px auto;
@@ -88,10 +108,27 @@ button:hover {
     padding: 25px;
     text-align: center;
     border-radius: 12px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.3);
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
 }
 
-/* CHART */
+/* ===== HEADINGS ===== */
+h2 {
+    margin-bottom: 15px;
+}
+
+/* ===== EMPTY / MESSAGE ===== */
+.message {
+    margin-top: 15px;
+    color: #888;
+}
+
+/* ===== LOADING TEXT ===== */
+.loading {
+    font-style: italic;
+    color: #666;
+}
+
+/* ===== CHART ===== */
 canvas {
     max-width: 400px;
     margin: 20px auto;

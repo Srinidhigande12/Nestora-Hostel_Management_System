@@ -1,96 +1,67 @@
-/* ===== GLOBAL ===== */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     margin: 0;
-    background: #f4f6f9;
+    background: #eef2f7;
 }
 
-/* ===== NAVBAR ===== */
 .navbar {
     background: #2c3e50;
     color: white;
-    padding: 15px 25px;
-    font-size: 18px;
-
+    padding: 15px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
 
 .navbar a {
     color: white;
     margin: 0 10px;
     text-decoration: none;
-    font-size: 16px;
 }
 
-.navbar a:hover {
-    text-decoration: underline;
-}
-
-/* ===== CONTAINER ===== */
 .container {
     padding: 20px;
-    max-width: 900px;
-    margin: auto;
 }
 
-/* ===== CARDS ===== */
 .cards {
     display: flex;
     gap: 20px;
-    flex-wrap: wrap;
-    margin-top: 20px;
 }
 
 .card {
-    flex: 1;
-    min-width: 200px;
     background: white;
     padding: 20px;
-    border-radius: 12px;
+    flex: 1;
     text-align: center;
-    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    box-shadow: 0 0 10px #ccc;
+    transition: 0.3s;
 }
 
-.card h3 {
-    margin: 10px 0;
+.card:hover {
+    transform: translateY(-5px);
 }
 
-/* ===== TABLE ===== */
 table {
     width: 100%;
+    background: white;
     margin-top: 20px;
     border-collapse: collapse;
-    background: white;
 }
 
 th, td {
-    border: 1px solid #ddd;
     padding: 10px;
-    text-align: center;
+    border: 1px solid #ddd;
 }
 
 th {
-    background: #2c3e50;
+    background: #34495e;
     color: white;
 }
 
-/* ===== FORM INPUTS ===== */
-input, select {
-    width: 90%;
-    padding: 10px;
-    margin: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-/* ===== BUTTON ===== */
 button {
-    padding: 10px 20px;
-    margin-top: 10px;
     background: #3498db;
     color: white;
+    padding: 8px 15px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -100,37 +71,13 @@ button:hover {
     background: #2980b9;
 }
 
-/* ===== LOGIN / SIGNUP BOX ===== */
-.login-container {
-    width: 320px;
-    margin: 100px auto;
+input {
+    padding: 10px;
+    margin: 10px;
+}
+
+ul {
     background: white;
-    padding: 25px;
-    text-align: center;
-    border-radius: 12px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
-}
-
-/* ===== HEADINGS ===== */
-h2 {
-    margin-bottom: 15px;
-}
-
-/* ===== EMPTY / MESSAGE ===== */
-.message {
-    margin-top: 15px;
-    color: #888;
-}
-
-/* ===== LOADING TEXT ===== */
-.loading {
-    font-style: italic;
-    color: #666;
-}
-
-/* ===== CHART ===== */
-canvas {
-    max-width: 400px;
-    margin: 20px auto;
-    display: block;
+    padding: 15px;
+    border-radius: 10px;
 }

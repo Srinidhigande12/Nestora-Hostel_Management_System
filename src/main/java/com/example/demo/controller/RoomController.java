@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Room;
-import com.example.demo.repository.RoomRepository;
+import com.example.demo.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,17 +13,15 @@ import java.util.List;
 public class RoomController {
 
     @Autowired
-    private RoomRepository roomRepository;
+    private RoomService roomService;
 
-    // ✅ GET ALL ROOMS
     @GetMapping
-    public List<Room> getAllRooms() {
-        return roomRepository.findAll();
+    public List<Room> getRooms() {
+        return roomService.getAllRooms();
     }
 
-    // ✅ ADD ROOM (ADMIN)
     @PostMapping
     public Room addRoom(@RequestBody Room room) {
-        return roomRepository.save(room);
+        return roomService.addRoom(room);
     }
 }

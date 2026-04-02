@@ -1,59 +1,27 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 public class Complaint {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long complaintId;
+    private Long id;
 
-    private String description;
-
+    private String username;
+    private String message;
     private String status;
 
-    private LocalDateTime createdAt;
+    // getters & setters
+    public Long getId() { return id; }
 
-    @ManyToOne
-    @JoinColumn(name = "resident_id")
-    private Resident resident;
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    public Complaint() {
-        this.createdAt = LocalDateTime.now();
-        this.status = "OPEN";
-    }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
 
-    public Long getComplaintId() {
-        return complaintId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public Resident getResident() {
-        return resident;
-    }
-
-    public void setResident(Resident resident) {
-        this.resident = resident;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

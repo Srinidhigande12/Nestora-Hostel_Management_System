@@ -9,31 +9,52 @@
 
 <div class="navbar">
     <div>
-        Admin | Welcome, <span id="usernameDisplay"></span>
+        Welcome, <span id="usernameDisplay"></span>
     </div>
     <div>
         <a href="/user-dashboard.html">Home</a>
-        <a href="/admin-dashboard.html">Admin</a>
+        <a href="/admin-dashboard.html" id="adminLink">Admin</a>
         <button onclick="logout()">Logout</button>
     </div>
 </div>
 
 <div class="container">
 
-    <h2>All Users</h2>
+    <!-- DASHBOARD CARDS -->
+    <div class="cards">
+        <div class="card">
+            <h3>Total Fees</h3>
+            <p id="totalFees">0</p>
+        </div>
+        <div class="card">
+            <h3>Paid</h3>
+            <p id="paidFees">0</p>
+        </div>
+        <div class="card">
+            <h3>Pending</h3>
+            <p id="pendingFees">0</p>
+        </div>
+    </div>
 
-    <button onclick="loadUsers()">Load Users</button>
-
+    <!-- FEES -->
+    <h2>Your Fees</h2>
     <table>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Action</th>
             </tr>
         </thead>
-        <tbody id="userTable"></tbody>
+        <tbody id="feesTable"></tbody>
     </table>
+
+    <!-- COMPLAINTS -->
+    <h2>Your Complaints</h2>
+    <input type="text" id="complaintInput" placeholder="Enter complaint">
+    <button onclick="addComplaint()">Submit</button>
+    <ul id="complaintList"></ul>
 
 </div>
 
@@ -42,17 +63,17 @@
 const token = localStorage.getItem("token");
 const role = localStorage.getItem("role");
 
-if (!token || !role) {
-    alert("Please login first ❌");
+if (!token) {
+    alert("Login first ❌");
     window.location.href = "/login.html";
 }
 
+// HIDE ADMIN LINK
 if (role !== "ADMIN") {
-    alert("Access denied ❌");
-    window.location.href = "/login.html";
+    document.getElementById("adminLink").style.display = "none";
 }
 
-// ✅ USERNAME
+// USERNAME
 function getUsernameFromToken() {
     const payload = token.split(".")[1];
     return JSON.parse(atob(payload)).sub;
@@ -60,44 +81,101 @@ function getUsernameFromToken() {
 
 document.getElementById("usernameDisplay").innerText = getUsernameFromToken();
 
-// ✅ LOAD USERS
-async function loadUsers() {
+// LOAD FEES
+async function loadFees() {
 
-    document.getElementById("userTable").innerHTML =
-        "<tr><td colspan='3'>Loading...</td></tr>";
-
-    const response = await fetch("/users", {
-        headers: {
-            "Authorization": "Bearer " + token
-        }
+    const res = await fetch("/fees", {
+        headers: { "Authorization": "Bearer " + token }
     });
 
-    if (!response.ok) {
-        alert("Error ❌");
-        return;
-    }
+    const data = await res.json();
 
-    const users = await response.json();
+    let total = 0, paid = 0, pending = 0;
 
-    const table = document.getElementById("userTable");
+    const table = document.getElementById("feesTable");
     table.innerHTML = "";
 
-    users.forEach(user => {
+    data.forEach(fee => {
+
+        total += fee.amount;
+
+        if (fee.status === "PAID") {
+            paid += fee.amount;
+        } else {
+            pending += fee.amount;
+        }
+
         table.innerHTML += `
             <tr>
-                <td>${user.id}</td>
-                <td>${user.username}</td>
-                <td>${user.email}</td>
+                <td>${fee.feeId}</td>
+                <td>${fee.amount}</td>
+                <td>${fee.status}</td>
+                <td>
+                    ${fee.status === "PENDING"
+                        ? `<button onclick="payFee(${fee.feeId})">Pay</button>`
+                        : "✔ Paid"}
+                </td>
             </tr>
         `;
     });
+
+    document.getElementById("totalFees").innerText = total;
+    document.getElementById("paidFees").innerText = paid;
+    document.getElementById("pendingFees").innerText = pending;
 }
 
-// ✅ LOGOUT
+// PAYMENT
+async function payFee(id) {
+    alert("Processing payment...");
+    await fetch(`/fees/pay/${id}`, {
+        method: "PUT",
+        headers: { "Authorization": "Bearer " + token }
+    });
+    alert("Payment successful ✅");
+    loadFees();
+}
+
+// COMPLAINTS
+async function loadComplaints() {
+
+    const username = getUsernameFromToken();
+
+    const res = await fetch(`/complaints/${username}`);
+    const data = await res.json();
+
+    const list = document.getElementById("complaintList");
+    list.innerHTML = "";
+
+    data.forEach(c => {
+        list.innerHTML += `<li>${c.message} - ${c.status}</li>`;
+    });
+}
+
+async function addComplaint() {
+
+    const message = document.getElementById("complaintInput").value;
+    const username = getUsernameFromToken();
+
+    await fetch("/complaints", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ username, message })
+    });
+
+    document.getElementById("complaintInput").value = "";
+    loadComplaints();
+}
+
+// LOGOUT
 function logout() {
     localStorage.clear();
     window.location.href = "/login.html";
 }
+
+window.onload = () => {
+    loadFees();
+    loadComplaints();
+};
 
 </script>
 

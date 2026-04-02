@@ -41,11 +41,12 @@ async function login() {
 
     const result = await response.json();
 
+    // ✅ SAVE TOKEN & ROLE
     localStorage.setItem("token", result.token);
     localStorage.setItem("role", result.role);
     console.log("TOKEN:", result.token);
     console.log("ROLE:", result.role);
-
+    // ✅ ROLE BASED REDIRECT
     if (result.role === "ADMIN") {
         window.location.href = "/admin-dashboard.html";
     } else {

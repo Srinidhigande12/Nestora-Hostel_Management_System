@@ -70,7 +70,8 @@ if (!token) {
 
 // HIDE ADMIN LINK
 if (role !== "ADMIN") {
-    document.getElementById("adminLink").style.display = "none";
+    alert("Access denied ❌");
+    window.location.href = "/login.html";
 }
 
 // USERNAME

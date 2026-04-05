@@ -1,60 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Nestora - Hostel Management System</title>
+    <title>Admin Dashboard - Nestora</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
 
 <div class="navbar">
+    <div>Admin Panel</div>
     <div>
-        Welcome, <span id="usernameDisplay"></span>
-    </div>
-    <div>
-        <a href="/user-dashboard.html">Home</a>
-        <a href="/admin-dashboard.html" id="adminLink">Admin</a>
+        <a href="/user-dashboard.html">User View</a>
         <button onclick="logout()">Logout</button>
     </div>
 </div>
 
 <div class="container">
 
-    <!-- DASHBOARD CARDS -->
-    <div class="cards">
-        <div class="card">
-            <h3>Total Fees</h3>
-            <p id="totalFees">0</p>
-        </div>
-        <div class="card">
-            <h3>Paid</h3>
-            <p id="paidFees">0</p>
-        </div>
-        <div class="card">
-            <h3>Pending</h3>
-            <p id="pendingFees">0</p>
-        </div>
-    </div>
+    <h2>All Complaints</h2>
+    <ul id="complaints"></ul>
 
-    <!-- FEES -->
-    <h2>Your Fees</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="feesTable"></tbody>
-    </table>
+    <h2>All Fees</h2>
+    <ul id="fees"></ul>
 
-    <!-- COMPLAINTS -->
-    <h2>Your Complaints</h2>
-    <input type="text" id="complaintInput" placeholder="Enter complaint">
-    <button onclick="addComplaint()">Submit</button>
-    <ul id="complaintList"></ul>
+    <button onclick="addRandomFee()">Add Random Fee</button>
 
 </div>
 
@@ -63,108 +32,70 @@
 const token = localStorage.getItem("token");
 const role = localStorage.getItem("role");
 
-if (!token) {
-    alert("Login first ❌");
+// Block non-admin
+if (!token || role !== "ADMIN") {
+    alert("Admins only ❌");
     window.location.href = "/login.html";
 }
 
-// HIDE ADMIN LINK
-if (role !== "ADMIN") {
-    alert("Access denied ❌");
-    window.location.href = "/login.html";
-}
+// LOAD DATA
+async function loadAdminData() {
 
-// USERNAME
-function getUsernameFromToken() {
-    const payload = token.split(".")[1];
-    return JSON.parse(atob(payload)).sub;
-}
-
-document.getElementById("usernameDisplay").innerText = getUsernameFromToken();
-
-// LOAD FEES
-async function loadFees() {
-
-    const res = await fetch("/fees", {
+    // COMPLAINTS
+    const compRes = await fetch("/admin/complaints", {
         headers: { "Authorization": "Bearer " + token }
     });
 
-    const data = await res.json();
+    const complaints = await compRes.json();
 
-    let total = 0, paid = 0, pending = 0;
+    const compList = document.getElementById("complaints");
+    compList.innerHTML = "";
 
-    const table = document.getElementById("feesTable");
-    table.innerHTML = "";
-
-    data.forEach(fee => {
-
-        total += fee.amount;
-
-        if (fee.status === "PAID") {
-            paid += fee.amount;
-        } else {
-            pending += fee.amount;
-        }
-
-        table.innerHTML += `
-            <tr>
-                <td>${fee.feeId}</td>
-                <td>${fee.amount}</td>
-                <td>${fee.status}</td>
-                <td>
-                    ${fee.status === "PENDING"
-                        ? `<button onclick="payFee(${fee.feeId})">Pay</button>`
-                        : "✔ Paid"}
-                </td>
-            </tr>
+    complaints.forEach(c => {
+        compList.innerHTML += `
+            <li>👤 ${c.username} → ${c.message} (${c.status})</li>
         `;
     });
 
-    document.getElementById("totalFees").innerText = total;
-    document.getElementById("paidFees").innerText = paid;
-    document.getElementById("pendingFees").innerText = pending;
-}
-
-// PAYMENT
-async function payFee(id) {
-    alert("Processing payment...");
-    await fetch(`/fees/pay/${id}`, {
-        method: "PUT",
+    // FEES
+    const feeRes = await fetch("/admin/fees", {
         headers: { "Authorization": "Bearer " + token }
     });
-    alert("Payment successful ✅");
-    loadFees();
-}
 
-// COMPLAINTS
-async function loadComplaints() {
+    const fees = await feeRes.json();
 
-    const username = getUsernameFromToken();
+    const feeList = document.getElementById("fees");
+    feeList.innerHTML = "";
 
-    const res = await fetch(`/complaints/${username}`);
-    const data = await res.json();
-
-    const list = document.getElementById("complaintList");
-    list.innerHTML = "";
-
-    data.forEach(c => {
-        list.innerHTML += `<li>${c.message} - ${c.status}</li>`;
+    fees.forEach(f => {
+        feeList.innerHTML += `
+            <li>👤 ${f.username} → ₹${f.amount} (${f.status})</li>
+        `;
     });
 }
 
-async function addComplaint() {
+// ADD RANDOM FEE
+async function addRandomFee() {
 
-    const message = document.getElementById("complaintInput").value;
-    const username = getUsernameFromToken();
+    const users = ["nidhi", "sri"];
+    const user = users[Math.floor(Math.random() * users.length)];
+    const amount = Math.floor(Math.random() * 5000) + 1000;
 
-    await fetch("/complaints", {
+    await fetch("/admin/fees", {
         method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ username, message })
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+            username: user,
+            amount: amount,
+            status: "PENDING"
+        })
     });
 
-    document.getElementById("complaintInput").value = "";
-    loadComplaints();
+    alert(`Fee added for ${user} ₹${amount}`);
+    loadAdminData();
 }
 
 // LOGOUT
@@ -173,10 +104,10 @@ function logout() {
     window.location.href = "/login.html";
 }
 
-window.onload = () => {
-    loadFees();
-    loadComplaints();
-};
+// AUTO REFRESH
+setInterval(loadAdminData, 5000);
+
+window.onload = loadAdminData;
 
 </script>
 

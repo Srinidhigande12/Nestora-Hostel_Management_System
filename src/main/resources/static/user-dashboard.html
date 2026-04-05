@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Nestora - Hostel Management System</title>
+    <title>User Dashboard - Nestora</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
 
 <div class="navbar">
-    <div>
-        Welcome, <span id="usernameDisplay"></span>
-    </div>
+    <div>Welcome, <span id="usernameDisplay"></span></div>
     <div>
         <a href="/user-dashboard.html">Home</a>
         <a href="/admin-dashboard.html" id="adminLink">Admin</a>
@@ -20,20 +18,11 @@
 
 <div class="container">
 
-    <!-- DASHBOARD CARDS -->
+    <!-- CARDS -->
     <div class="cards">
-        <div class="card">
-            <h3>Total Fees</h3>
-            <p id="totalFees">0</p>
-        </div>
-        <div class="card">
-            <h3>Paid</h3>
-            <p id="paidFees">0</p>
-        </div>
-        <div class="card">
-            <h3>Pending</h3>
-            <p id="pendingFees">0</p>
-        </div>
+        <div class="card"><h3>Total Fees</h3><p id="totalFees">0</p></div>
+        <div class="card"><h3>Paid</h3><p id="paidFees">0</p></div>
+        <div class="card"><h3>Pending</h3><p id="pendingFees">0</p></div>
     </div>
 
     <!-- FEES -->
@@ -41,10 +30,7 @@
     <table>
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th>ID</th><th>Amount</th><th>Status</th><th>Action</th>
             </tr>
         </thead>
         <tbody id="feesTable"></tbody>
@@ -68,12 +54,12 @@ if (!token) {
     window.location.href = "/login.html";
 }
 
-// HIDE ADMIN LINK
+// Hide admin link
 if (role !== "ADMIN") {
     document.getElementById("adminLink").style.display = "none";
 }
 
-// USERNAME
+// Username
 function getUsernameFromToken() {
     const payload = token.split(".")[1];
     return JSON.parse(atob(payload)).sub;
@@ -83,7 +69,6 @@ document.getElementById("usernameDisplay").innerText = getUsernameFromToken();
 
 // LOAD FEES
 async function loadFees() {
-
     const res = await fetch("/fees", {
         headers: { "Authorization": "Bearer " + token }
     });
@@ -91,19 +76,14 @@ async function loadFees() {
     const data = await res.json();
 
     let total = 0, paid = 0, pending = 0;
-
     const table = document.getElementById("feesTable");
     table.innerHTML = "";
 
     data.forEach(fee => {
-
         total += fee.amount;
 
-        if (fee.status === "PAID") {
-            paid += fee.amount;
-        } else {
-            pending += fee.amount;
-        }
+        if (fee.status === "PAID") paid += fee.amount;
+        else pending += fee.amount;
 
         table.innerHTML += `
             <tr>
@@ -124,23 +104,23 @@ async function loadFees() {
     document.getElementById("pendingFees").innerText = pending;
 }
 
-// PAYMENT
+// PAY
 async function payFee(id) {
-    alert("Processing payment...");
     await fetch(`/fees/pay/${id}`, {
         method: "PUT",
         headers: { "Authorization": "Bearer " + token }
     });
+
     alert("Payment successful ✅");
     loadFees();
 }
 
-// COMPLAINTS
+// LOAD COMPLAINTS
 async function loadComplaints() {
+    const res = await fetch("/complaints/my", {
+        headers: { "Authorization": "Bearer " + token }
+    });
 
-    const username = getUsernameFromToken();
-
-    const res = await fetch(`/complaints/${username}`);
     const data = await res.json();
 
     const list = document.getElementById("complaintList");
@@ -151,17 +131,25 @@ async function loadComplaints() {
     });
 }
 
+// ADD COMPLAINT
 async function addComplaint() {
-
     const message = document.getElementById("complaintInput").value;
-    const username = getUsernameFromToken();
+
+    if (!message) {
+        alert("Enter complaint ❌");
+        return;
+    }
 
     await fetch("/complaints", {
         method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ username, message })
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ message })
     });
 
+    alert("Complaint submitted ✅");
     document.getElementById("complaintInput").value = "";
     loadComplaints();
 }

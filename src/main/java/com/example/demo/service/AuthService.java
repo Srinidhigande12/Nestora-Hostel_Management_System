@@ -24,7 +24,7 @@ public class AuthService {
     public User signup(User user) {
 
         if (userRepository.findByUsername(user.getUsername()) != null) {
-            throw new RuntimeException("Username already exists");
+            throw new RuntimeException("User already exists");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -47,7 +47,7 @@ public class AuthService {
         }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Wrong password");
+            throw new RuntimeException("Invalid password");
         }
 
         String token = JwtUtil.generateToken(user.getUsername());

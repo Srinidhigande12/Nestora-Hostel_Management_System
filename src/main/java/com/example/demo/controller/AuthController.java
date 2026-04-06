@@ -8,32 +8,32 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
-@CrossOrigin
+@RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
 public class AuthController {
 
     @Autowired
     private AuthService authService;
 
-    // ✅ SIGNUP
+    // ✅ SIGNUP FIXED
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody User user) {
         try {
             return ResponseEntity.ok(authService.signup(user));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage()); // ✅ FIX
         }
     }
 
-    // ✅ LOGIN
+    // ✅ LOGIN FIXED
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
         try {
             return ResponseEntity.ok(
                     authService.login(user.getUsername(), user.getPassword())
             );
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage()); // ✅ FIX
         }
     }
 }

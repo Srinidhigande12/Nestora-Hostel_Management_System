@@ -15,25 +15,29 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    // ✅ SIGNUP FIXED
+    // ✅ SIGNUP
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody User user) {
         try {
             return ResponseEntity.ok(authService.signup(user));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // ✅ FIX
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Signup failed");
         }
     }
 
-    // ✅ LOGIN FIXED
+    // ✅ LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
         try {
             return ResponseEntity.ok(
-                    authService.login(user.getUsername(), user.getPassword())
+                authService.login(user.getUsername(), user.getPassword())
             );
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage()); // ✅ FIX
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Login failed");
         }
     }
 }

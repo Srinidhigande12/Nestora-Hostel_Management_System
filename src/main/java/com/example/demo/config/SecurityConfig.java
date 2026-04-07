@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class SecurityConfig {
 
-    // 🔐 REQUIRED (THIS FIXES YOUR ERROR)
+    // 🔥 THIS IS MISSING (MAIN FIX)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -23,9 +23,9 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> {})
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().permitAll()
-            );
+            )
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
     }

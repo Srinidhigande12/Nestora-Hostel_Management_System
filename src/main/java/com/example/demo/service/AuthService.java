@@ -23,13 +23,15 @@ public class AuthService {
     // ✅ SIGNUP
     public User signup(User user) {
 
-        if (userRepository.findByUsername(user.getUsername()) != null) {
+        // check if user exists
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new RuntimeException("User already exists");
         }
 
+        // encode password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        // ✅ VERY IMPORTANT FIX
+        // set default role
         if (user.getRole() == null || user.getRole().isEmpty()) {
             user.setRole("USER");
         }
@@ -37,19 +39,18 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    // ✅ LOGIN (USERNAME + ROLE)
+    // ✅ LOGIN
     public Map<String, String> login(String username, String password) {
 
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
-
+        // check password
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
 
+        // generate token
         String token = JwtUtil.generateToken(user.getUsername());
 
         Map<String, String> response = new HashMap<>();
